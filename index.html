@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘 뭐 먹지?</title>
+    <style>
+        /* 기본 스타일 설정 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        /* 메인 컨테이너 */
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 24px;
+            color: #2c3e50;
+        }
+
+        p.subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        /* 메뉴가 표시될 박스 */
+        .menu-display {
+            font-size: 32px;
+            font-weight: bold;
+            color: #e74c3c;
+            height: 50px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 버튼 디자인 */
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>오늘 뭐 먹지? 🍽️</h1>
+        <p class="subtitle">결정 장애를 위한 점심 메뉴 랜덤 추천기</p>
+        
+        <div class="menu-display" id="menuDisplay">?</div>
+        
+        <button id="recommendBtn" onclick="startRoulette()">메뉴 추천받기!</button>
+    </div>
+
+    <script>
+        // 메뉴 리스트 배열
+        const menus = [
+            '김치찌개', '된장찌개', '제육볶음', '돈까스', '짜장면', 
+            '짬뽕', '햄버거', '샌드위치', '샐러드', '초밥', 
+            '국밥', '냉면', '마라탕', '떡볶이', '피자', 
+            '치킨', '쌀국수', '우동', '백반정식', '카레'
+        ];
+
+        let rouletteInterval;
+
+        function startRoulette() {
+            const display = document.getElementById('menuDisplay');
+            const btn = document.getElementById('recommendBtn');
+            
+            // 버튼 비활성화 (룰렛이 돌아가는 동안 중복 클릭 방지)
+            btn.disabled = true;
+            btn.innerText = '고민 중... 🤔';
+
+            // 빠르게 메뉴가 바뀌는 효과 (0.05초마다)
+            let count = 0;
+            rouletteInterval = setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * menus.length);
+                display.innerText = menus[randomIndex];
+                count++;
+
+                // 약 1.5초(30번 반복) 후 멈춤
+                if (count > 30) {
+                    clearInterval(rouletteInterval);
+                    showFinalResult();
+                }
+            }, 50);
+        }
+
+        function showFinalResult() {
+            const display = document.getElementById('menuDisplay');
+            const btn = document.getElementById('recommendBtn');
+            
+            // 최종 메뉴 하나를 랜덤하게 다시 뽑아 고정
+            const finalIndex = Math.floor(Math.random() * menus.length);
+            display.innerText = `✨ ${menus[finalIndex]} ✨`;
+            
+            // 버튼 원상복구
+            btn.disabled = false;
+            btn.innerText = '다시 뽑기!';
+        }
+    </script>
+
+</body>
+</html>
