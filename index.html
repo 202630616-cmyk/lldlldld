@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bauhaus Safe Departure Calculator</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Space Grotesk & Josefin Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bhRed: '#D02B27',
+            bhYellow: '#F3C010',
+            bhBlue: '#1E3888',
+            bhOffWhite: '#F4F3EF',
+            bhDark: '#111111',
+            bhGray: '#888888',
+            bhLightGray: '#E2E0D8'
+          },
+          fontFamily: {
+            sans: ['Space Grotesk', 'Josefin Sans', 'sans-serif'],
+            display: ['Josefin Sans', 'Space Grotesk', 'sans-serif']
+          },
+          boxShadow: {
+            'bh-sm': '3px 3px 0px #111111',
+            'bh-md': '5px 5px 0px #111111',
+            'bh-lg': '8px 8px 0px #111111'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * {
+      border-radius: 0px !important; /* Strict Bauhaus zero rounded corners */
+    }
+
+    body {
+      background-color: #F4F3EF;
+      color: #111111;
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: 0.02em;
+    }
+
+    /* Input & Interactive Styles */
+    .bh-border {
+      border: 3px solid #111111;
+    }
+
+    .bh-border-sm {
+      border: 2px solid #111111;
+    }
+
+    .bh-input {
+      border: 2.5px solid #111111;
+      background-color: #FFFFFF;
+      color: #111111;
+      font-weight: 700;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .bh-input:focus {
+      background-color: #F3C010;
+      color: #111111;
+      box-shadow: 4px 4px 0px #111111;
+    }
+
+    .bh-card-red {
+      background-color: #D02B27;
+      color: #FFFFFF;
+      border: 3px solid #111111;
+      box-shadow: 5px 5px 0px #111111;
+    }
+
+    .bh-card-yellow {
+      background-color: #F3C010;
+      color: #111111;
+      border: 3px solid #111111;
+      box-shadow: 5px 5px 0px #111111;
+    }
+
+    .bh-card-blue {
+      background-color: #1E3888;
+      color: #FFFFFF;
+      border: 3px solid #111111;
+      box-shadow: 5px 5px 0px #111111;
+    }
+
+    .bh-card-white {
+      background-color: #FFFFFF;
+      color: #111111;
+      border: 3px solid #111111;
+      box-shadow: 5px 5px 0px #111111;
+    }
+
+    .bh-btn {
+      border: 3px solid #111111;
+      background-color: #111111;
+      color: #FFFFFF;
+      font-weight: 800;
+      text-transform: uppercase;
+      box-shadow: 4px 4px 0px #111111;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+
+    .bh-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px #111111;
+      background-color: #D02B27;
+      color: #FFFFFF;
+    }
+
+    .bh-btn-secondary {
+      border: 3px solid #111111;
+      background-color: #FFFFFF;
+      color: #111111;
+      font-weight: 800;
+      text-transform: uppercase;
+      box-shadow: 4px 4px 0px #111111;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+
+    .bh-btn-secondary:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px #111111;
+      background-color: #F3C010;
+    }
+
+    /* Option Box Inversion Styling */
+    .opt-card {
+      border: 2.5px solid #111111;
+      background-color: #FFFFFF;
+      color: #111111;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .opt-card:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0px #111111;
+    }
+
+    .opt-card.selected-red {
+      background-color: #D02B27 !important;
+      color: #FFFFFF !important;
+      box-shadow: 4px 4px 0px #111111 !important;
+    }
+
+    .opt-card.selected-blue {
+      background-color: #1E3888 !important;
+      color: #FFFFFF !important;
+      box-shadow: 4px 4px 0px #111111 !important;
+    }
+
+    .opt-card.selected-yellow {
+      background-color: #F3C010 !important;
+      color: #111111 !important;
+      box-shadow: 4px 4px 0px #111111 !important;
+    }
+
+    /* Range slider style */
+    input[type=range] {
+      accent-color: #D02B27;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-bhOffWhite text-bhDark p-3 sm:p-6 lg:p-8 flex flex-col justify-between">
+
+  <div class="max-w-7xl mx-auto w-full">
+
+    <!-- HEADER BLOCK WITH GEOMETRIC PALETTE -->
+    <header class="bh-card-white mb-6 p-0 overflow-hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+        
+        <!-- TITLE SECTION (8 COLS) -->
+        <div class="lg:col-span-8 p-6 lg:p-8 flex flex-col justify-between border-b-3 lg:border-b-0 lg:border-r-3 border-bhDark">
+          <div>
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+              <span class="bg-bhRed text-white text-xs font-black px-2.5 py-1 tracking-widest border border-bhDark uppercase">
+                FORM FOLLOWS FUNCTION
+              </span>
+              <span class="bg-bhYellow text-bhDark text-xs font-black px-2.5 py-1 tracking-widest border border-bhDark uppercase">
+                BAUHAUS PALETTE
+              </span>
+              <span class="bg-bhBlue text-white text-xs font-black px-2.5 py-1 tracking-widest border border-bhDark uppercase">
+                PUNCTUALITY ENGINE
+              </span>
+            </div>
+
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight text-bhDark font-display leading-none my-2">
+              SAFE DEPARTURE<br><span class="text-bhRed">CALCULATOR</span>
+            </h1>
+
+            <p class="text-xs sm:text-sm font-bold text-bhDark mt-3 max-w-xl">
+              PRECISION ARRIVAL TIME CALCULATOR ACCOUNTING FOR TRANSIT VARIANCES, WEATHER DISRUPTIONS & TIME-OF-DAY TRAFFIC PEAKS WITH MANDATORY 5-MINUTE BAUHAUS SAFETY BUFFER.
+            </p>
+          </div>
+
+          <div class="mt-6 pt-4 border-t-2 border-bhDark flex flex-wrap items-center justify-between text-xs font-bold gap-2">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-bhRed inline-block border border-bhDark"></span> RED: TIME DELAY</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-bhYellow inline-block border border-bhDark"></span> YELLOW: BUFFER</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-bhBlue inline-block border border-bhDark"></span> BLUE: BASE TRANSIT</span>
+            <span class="bg-bhDark text-white px-2 py-0.5 font-mono">+5 MIN SAFETY GUARANTEE</span>
+          </div>
+        </div>
+
+        <!-- LIVE BAUHAUS ANALOG CLOCK SECTION (4 COLS) -->
+        <div class="lg:col-span-4 bg-bhYellow p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+          <div class="text-xs font-black tracking-widest text-bhDark uppercase mb-3 bg-white px-2 py-1 border border-bhDark shadow-[2px_2px_0px_#111111]">
+            SYSTEM REAL-TIME CLOCK
+          </div>
+          
+          <!-- MINIMAL BAUHAUS SVG ANALOG CLOCK -->
+          <div class="w-40 h-40 relative my-1">
+            <svg id="analogClock" viewBox="0 0 100 100" class="w-full h-full drop-shadow-[4px_4px_0px_rgba(17,17,17,1)]">
+              <!-- Clock Outer Background -->
+              <rect x="2" y="2" width="96" height="96" fill="#FFFFFF" stroke="#111111" stroke-width="3" />
+              <!-- Inner Geometric Ring -->
+              <circle cx="50" cy="50" r="42" fill="#F4F3EF" stroke="#111111" stroke-width="2.5" />
+              
+              <!-- Primary Color Ticks -->
+              <rect x="48" y="10" width="4" height="8" fill="#D02B27" />
+              <rect x="48" y="82" width="4" height="8" fill="#1E3888" />
+              <rect x="10" y="48" width="8" height="4" fill="#D02B27" />
+              <rect x="82" y="48" width="8" height="4" fill="#1E3888" />
+
+              <!-- Secondary Ticks -->
+              <line x1="71" y1="21" x2="67" y2="25" stroke="#111111" stroke-width="2"/>
+              <line x1="79" y1="71" x2="75" y2="67" stroke="#111111" stroke-width="2"/>
+              <line x1="29" y1="79" x2="33" y2="75" stroke="#111111" stroke-width="2"/>
+              <line x1="21" y1="29" x2="25" y2="33" stroke="#111111" stroke-width="2"/>
+
+              <!-- Hour Hand (Red) -->
+              <line id="hourHand" x1="50" y1="50" x2="50" y2="28" stroke="#D02B27" stroke-width="5" stroke-linecap="square"/>
+              <!-- Minute Hand (Blue) -->
+              <line id="minuteHand" x1="50" y1="50" x2="50" y2="18" stroke="#1E3888" stroke-width="3.5" stroke-linecap="square"/>
+              <!-- Second Hand (Dark) -->
+              <line id="secondHand" x1="50" y1="50" x2="50" y2="14" stroke="#111111" stroke-width="1.5"/>
+              
+              <!-- Center Hub (Yellow Circle with Black Ring) -->
+              <circle cx="50" cy="50" r="5" fill="#F3C010" stroke="#111111" stroke-width="2"/>
+            </svg>
+          </div>
+
+          <!-- Digital Readout -->
+          <div id="digitalClock" class="text-2xl font-black tracking-widest text-bhDark font-mono bg-white px-3 py-1 border-2 border-bhDark shadow-[3px_3px_0px_#111111] mt-2">
+            00:00:00 AM
+          </div>
+          <div id="digitalDate" class="text-[11px] font-black text-bhDark uppercase tracking-wider mt-2">
+            2026.09.18 FRIDAY
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- PRESET SCENARIO BAR -->
+    <section class="mb-6">
+      <div class="bh-card-white p-3 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <span class="w-4 h-4 bg-bhRed border border-bhDark inline-block"></span>
+          <span class="text-xs font-black tracking-wider text-bhDark uppercase">
+            SCENARIO PRESETS:
+          </span>
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs">
+          <button onclick="applyPreset('morning_rush')" class="bh-btn-secondary px-3 py-1.5 text-xs">
+            MORNING RUSH (+20 MIN)
+          </button>
+          <button onclick="applyPreset('friday_night')" class="bh-btn-secondary px-3 py-1.5 text-xs">
+            FRIDAY NIGHT (+27 MIN)
+          </button>
+          <button onclick="applyPreset('storm_delay')" class="bh-btn-secondary px-3 py-1.5 text-xs">
+            STORM / SNOW (+30 MIN)
+          </button>
+          <button onclick="applyPreset('late_night')" class="bh-btn-secondary px-3 py-1.5 text-xs">
+            LATE NIGHT (+17 MIN)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN CALCULATOR GRID -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT COLUMN: INPUT CONTROLS (7 COLS) -->
+      <div class="lg:col-span-7 space-y-6">
+
+        <!-- STEP 01: ROUTE & TIME PARAMETERS -->
+        <div class="bh-card-white p-5 relative">
+          <div class="bg-bhRed text-white text-xs font-black px-3 py-1 inline-block border-2 border-bhDark shadow-[2px_2px_0px_#111111] uppercase mb-4">
+            STEP 01 // LOCATION & APPOINTMENT TIME
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Origin -->
+            <div>
+              <label class="block text-xs font-black mb-1.5 text-bhDark uppercase">
+                DEPARTURE LOCATION
+              </label>
+              <input type="text" id="origin" value="CENTRAL STATION" placeholder="E.G. HOME, OFFICE" class="w-full p-2.5 text-xs bh-input">
+            </div>
+
+            <!-- Destination -->
+            <div>
+              <label class="block text-xs font-black mb-1.5 text-bhDark uppercase">
+                DESTINATION LOCATION
+              </label>
+              <input type="text" id="destination" value="BAUHAUS ARCHIVE" placeholder="E.G. VENUE, DOWNTOWN" class="w-full p-2.5 text-xs bh-input">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+            <!-- Target Arrival Date -->
+            <div>
+              <label class="block text-xs font-black mb-1.5 text-bhDark uppercase">
+                TARGET ARRIVAL DATE
+              </label>
+              <input type="date" id="targetDate" class="w-full p-2.5 text-xs bh-input">
+            </div>
+
+            <!-- Target Arrival Time -->
+            <div>
+              <label class="block text-xs font-black mb-1.5 text-bhDark uppercase">
+                TARGET ARRIVAL TIME
+              </label>
+              <input type="time" id="targetTime" value="19:00" class="w-full p-2.5 text-xs bh-input">
+            </div>
+          </div>
+
+          <!-- Base Duration Input & Slider -->
+          <div class="mt-4 p-3 bg-bhOffWhite border-2 border-bhDark">
+            <div class="flex justify-between items-center mb-1.5">
+              <label class="text-xs font-black text-bhDark uppercase">
+                BASE TRANSIT DURATION (NO DELAYS)
+              </label>
+              <span id="baseMinutesVal" class="bg-bhBlue text-white font-mono font-black text-xs px-2 py-0.5 border border-bhDark">
+                30 MINS
+              </span>
+            </div>
+            <div class="flex items-center gap-3">
+              <input type="range" id="baseMinutesRange" min="5" max="180" value="30" step="5" class="w-full h-3 bg-white border-2 border-bhDark appearance-none cursor-pointer">
+              <input type="number" id="baseMinutes" value="30" min="1" max="300" class="w-20 p-1.5 text-xs bh-input text-center font-mono">
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 02: TRANSIT & WEATHER CONDITIONS -->
+        <div class="bh-card-white p-5">
+          <div class="bg-bhBlue text-white text-xs font-black px-3 py-1 inline-block border-2 border-bhDark shadow-[2px_2px_0px_#111111] uppercase mb-4">
+            STEP 02 // TRANSIT MODE & WEATHER VARIANCE
+          </div>
+
+          <!-- Transit Selection -->
+          <div class="mb-5">
+            <label class="block text-xs font-black mb-2 text-bhDark uppercase">
+              SELECT TRANSIT MODE
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="transitContainer">
+              <div onclick="setTransit('subway')" id="transit-subway" class="opt-card p-3 text-center">
+                <div class="text-xs font-black uppercase">SUBWAY</div>
+                <div class="text-[10px] font-bold mt-1 text-bhDark opacity-80">+0 MIN (FIXED RAIL)</div>
+              </div>
+              <div onclick="setTransit('bus')" id="transit-bus" class="opt-card p-3 text-center">
+                <div class="text-xs font-black uppercase">BUS</div>
+                <div class="text-[10px] font-bold mt-1 text-bhDark opacity-80">+5 MIN (SURFACE TRAFFIC)</div>
+              </div>
+              <div onclick="setTransit('combined')" id="transit-combined" class="opt-card p-3 text-center">
+                <div class="text-xs font-black uppercase">BUS + SUBWAY</div>
+                <div class="text-[10px] font-bold mt-1 text-bhDark opacity-80">+7 MIN (TRANSFER TIME)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weather Selection -->
+          <div>
+            <label class="block text-xs font-black mb-2 text-bhDark uppercase">
+              SELECT WEATHER CONDITION
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="weatherContainer">
+              <div onclick="setWeather('clear')" id="weather-clear" class="opt-card p-2.5 text-center">
+                <div class="text-xs font-black uppercase">CLEAR / NORMAL</div>
+                <div class="text-[10px] font-bold mt-1">+0 MIN</div>
+              </div>
+              <div onclick="setWeather('rain')" id="weather-rain" class="opt-card p-2.5 text-center">
+                <div class="text-xs font-black uppercase">RAIN</div>
+                <div class="text-[10px] font-bold mt-1">+10 MIN</div>
+              </div>
+              <div onclick="setWeather('snow')" id="weather-snow" class="opt-card p-2.5 text-center">
+                <div class="text-xs font-black uppercase">SNOW / ICE</div>
+                <div class="text-[10px] font-bold mt-1">+20 MIN</div>
+              </div>
+              <div onclick="setWeather('storm')" id="weather-storm" class="opt-card p-2.5 text-center">
+                <div class="text-xs font-black uppercase">SEVERE STORM</div>
+                <div class="text-[10px] font-bold mt-1">+25 MIN</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 03: TIME-OF-DAY TRAFFIC CONDITION -->
+        <div class="bh-card-white p-5">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div class="bg-bhYellow text-bhDark text-xs font-black px-3 py-1 inline-block border-2 border-bhDark shadow-[2px_2px_0px_#111111] uppercase">
+              STEP 03 // TIME SLOT VARIANCE
+            </div>
+            <button onclick="autoDetectTimeSlot()" class="bh-btn-secondary text-[10px] font-black px-2.5 py-1">
+              AUTO-SYNC WITH TARGET TIME
+            </button>
+          </div>
+
+          <label class="block text-xs font-black mb-2 text-bhDark uppercase">
+            SPECIFIC TIME SLOT PARAMETER
+          </label>
+          <select id="timeSlotSelect" onchange="manualTimeSlotChange()" class="w-full p-3 text-xs bh-input font-bold uppercase cursor-pointer">
+            <option value="midnight">LATE NIGHT / EARLY MORNING (00:00–06:00) [+10 MIN - HEADWAY DELAY]</option>
+            <option value="morning_rush">MORNING PEAK RUSH (07:30–09:00) [+15 MIN - BOARDING CONGESTION]</option>
+            <option value="daytime_standard">DAYTIME OFF-PEAK (09:00–17:00) [+0 MIN - HIGH PUNCTUALITY]</option>
+            <option value="evening_rush">EVENING PEAK RUSH (17:30–20:00) [+15 MIN - VEHICLE CONGESTION]</option>
+            <option value="weekend_night">FRIDAY / WEEKEND EVENING (18:00–22:00) [+20 MIN - DOWNTOWN GRIDLOCK]</option>
+            <option value="weekend_afternoon">WEEKEND AFTERNOON (12:00–17:00) [+10 MIN - COMMERCIAL CONGESTION]</option>
+            <option value="last_train">NEAR LAST TRAIN / BUS (22:30–24:00) [+10 MIN - EXTENDED TRANSIT WAITS]</option>
+          </select>
+
+          <div id="slotDetectionBadge" class="mt-3 p-2 bg-bhOffWhite border-2 border-bhDark text-[11px] font-bold text-bhDark flex items-center justify-between">
+            <span id="slotDetectionText">TIME SLOT SYNCHRONIZED WITH TARGET ARRIVAL TIME</span>
+            <span class="bg-bhDark text-white text-[9px] font-black px-2 py-0.5 uppercase">SYNCED</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: RESULTS & BREAKDOWN (5 COLS) -->
+      <div class="lg:col-span-5 space-y-6">
+
+        <!-- RECOMMENDED DEPARTURE TIME DISPLAY BOX -->
+        <div class="bh-card-red p-6 text-center relative overflow-hidden">
+          <div class="text-xs font-black tracking-widest text-white uppercase mb-1 opacity-90">
+            RECOMMENDED DEPARTURE TIME
+          </div>
+
+          <!-- HUGE TYPOGRAPHY TIME -->
+          <div class="my-2 bg-white text-bhDark p-4 border-3 border-bhDark shadow-[5px_5px_0px_#111111]">
+            <div id="depTimeBig" class="text-5xl sm:text-6xl font-black text-bhDark font-display tracking-tight leading-none">
+              --:--
+            </div>
+            <div id="depTimePeriod" class="text-base font-black text-bhRed mt-1 uppercase">
+              --
+            </div>
+          </div>
+
+          <!-- TOTAL LEAD TIME STATUS BAR -->
+          <div class="bg-bhDark text-white p-3 text-xs font-black flex items-center justify-between my-3 border border-white">
+            <span>TOTAL LEAD TIME REQUIRED:</span>
+            <span id="totalLeadDisplay" class="text-sm font-black text-bhYellow font-mono">-- MINS</span>
+          </div>
+
+          <!-- EXPIRED / PAST WARNING BLOCK -->
+          <div id="expiredWarning" class="hidden bg-bhYellow text-bhDark p-3 text-xs font-black text-center mb-3 border-2 border-bhDark">
+            ATTENTION: RECOMMENDED DEPARTURE TIME HAS ALREADY PASSED RELATIVE TO CURRENT TIME
+          </div>
+
+          <!-- ACTION BUTTONS -->
+          <div class="grid grid-cols-2 gap-2 mt-3">
+            <button onclick="copySummary()" class="bh-btn py-2.5 text-xs font-black">
+              COPY SUMMARY
+            </button>
+            <button onclick="recalculate()" class="bh-btn-secondary py-2.5 text-xs font-black">
+              RECALCULATE
+            </button>
+          </div>
+        </div>
+
+        <!-- VISUAL BREAKDOWN BAR -->
+        <div class="bh-card-white p-5">
+          <div class="text-xs font-black tracking-widest text-bhDark uppercase mb-3 flex items-center justify-between">
+            <span>PROPORTIONAL DELAY VISUALIZER</span>
+            <span class="bg-bhDark text-white text-[9px] px-2 py-0.5 font-mono">GEOMETRIC MAP</span>
+          </div>
+
+          <!-- Stacked Bar Chart -->
+          <div class="w-full h-8 bg-bhOffWhite border-2 border-bhDark flex overflow-hidden mb-3">
+            <div id="bar-base" class="bg-bhBlue h-full border-r border-bhDark flex items-center justify-center text-[10px] font-black text-white font-mono" style="width: 50%;" title="Base Time">
+              BASE
+            </div>
+            <div id="bar-transit" class="bg-bhRed h-full border-r border-bhDark flex items-center justify-center text-[10px] font-black text-white font-mono" style="width: 10%;" title="Transit Delay">
+              TR
+            </div>
+            <div id="bar-weather" class="bg-bhRed h-full border-r border-bhDark flex items-center justify-center text-[10px] font-black text-white font-mono" style="width: 15%;" title="Weather Delay">
+              WX
+            </div>
+            <div id="bar-slot" class="bg-bhRed h-full border-r border-bhDark flex items-center justify-center text-[10px] font-black text-white font-mono" style="width: 15%;" title="Time Slot Delay">
+              TS
+            </div>
+            <div id="bar-buffer" class="bg-bhYellow h-full flex items-center justify-center text-[10px] font-black text-bhDark font-mono" style="width: 10%;" title="Safety Buffer">
+              BUF
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[10px] font-black">
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-bhBlue border border-bhDark"></span> BASE TRANSIT</div>
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-bhRed border border-bhDark"></span> DELAYS (TR/WX/TS)</div>
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-bhYellow border border-bhDark"></span> 5 MIN SAFETY</div>
+          </div>
+        </div>
+
+        <!-- ITEMIZED SUMMARY BREAKDOWN TABLE -->
+        <div class="bh-card-white p-5">
+          <div class="text-xs font-black tracking-widest text-bhDark uppercase mb-3 flex items-center justify-between">
+            <span>MATHEMATICAL BREAKDOWN</span>
+            <span class="bg-bhBlue text-white text-[10px] px-2 py-0.5 font-mono">FORMULA</span>
+          </div>
+
+          <div class="space-y-2 text-xs font-bold">
+            <div class="flex justify-between items-center p-2 bg-bhOffWhite border border-bhDark">
+              <span class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-bhBlue"></span> BASE TRANSIT DURATION
+              </span>
+              <span id="tbl-base" class="font-mono font-black">30 MIN</span>
+            </div>
+
+            <div class="flex justify-between items-center p-2 bg-bhOffWhite border border-bhDark">
+              <span class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-bhRed"></span> TRANSIT MODE DELAY
+              </span>
+              <span id="tbl-transit" class="font-mono font-black">+0 MIN</span>
+            </div>
+
+            <div class="flex justify-between items-center p-2 bg-bhOffWhite border border-bhDark">
+              <span class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-bhRed"></span> WEATHER DELAY
+              </span>
+              <span id="tbl-weather" class="font-mono font-black">+0 MIN</span>
+            </div>
+
+            <div class="flex justify-between items-center p-2 bg-bhOffWhite border border-bhDark">
+              <span class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-bhRed"></span> TIME SLOT TRAFFIC VARIANCE
+              </span>
+              <span id="tbl-timeslot" class="font-mono font-black">+20 MIN</span>
+            </div>
+
+            <div class="flex justify-between items-center p-2 bg-bhYellow border border-bhDark">
+              <span class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-bhDark"></span> BAUHAUS SAFETY MARGIN
+              </span>
+              <span id="tbl-buffer" class="font-mono font-black">+5 MIN</span>
+            </div>
+
+            <div class="flex justify-between items-center p-2.5 bg-bhDark text-white font-black text-sm border-2 border-bhDark mt-2">
+              <span>TOTAL LEAD TIME</span>
+              <span id="tbl-total" class="font-mono font-black text-bhYellow">55 MIN</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TIMELINE SEQUENCE DISPLAY -->
+        <div class="bh-card-white p-5">
+          <div class="text-xs font-black tracking-widest text-bhDark uppercase mb-4">
+            ARRIVAL TIMELINE SEQUENCE
+          </div>
+
+          <div class="space-y-4 text-xs font-bold border-l-4 border-bhDark pl-4 ml-2">
+            <div>
+              <div class="text-[10px] text-bhRed font-black uppercase">01 // RECOMMENDED DEPARTURE</div>
+              <div id="tl-dep" class="text-lg font-black font-mono text-bhDark">--:--</div>
+              <div class="text-[11px] text-bhDark opacity-80 uppercase">LEAVE DEPARTURE LOCATION</div>
+            </div>
+
+            <div>
+              <div class="text-[10px] text-bhYellow bg-bhDark px-1 py-0.2 inline-block font-black uppercase">02 // SAFE ARRIVAL (5 MIN EARLY)</div>
+              <div id="tl-arr" class="text-lg font-black font-mono text-bhDark">--:--</div>
+              <div class="text-[11px] text-bhDark opacity-80 uppercase">ARRIVE AT DESTINATION LOCATION</div>
+            </div>
+
+            <div>
+              <div class="text-[10px] text-bhBlue font-black uppercase">03 // TARGET ARRIVAL APPOINTMENT</div>
+              <div id="tl-target" class="text-lg font-black font-mono text-bhDark">--:--</div>
+              <div class="text-[11px] text-bhDark opacity-80 uppercase">EXACT APPOINTMENT TIME</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- FOOTER BANNER -->
+    <footer class="mt-8 bh-card-white p-4 bg-bhDark text-white flex flex-col sm:flex-row items-center justify-between text-xs font-bold gap-3">
+      <div class="flex items-center gap-2">
+        <span class="w-3 h-3 bg-bhRed inline-block"></span>
+        <span class="w-3 h-3 bg-bhYellow inline-block"></span>
+        <span class="w-3 h-3 bg-bhBlue inline-block"></span>
+        <span>BAUHAUS GEOMETRIC PUNCTUALITY ENGINE</span>
+      </div>
+      <div class="text-bhLightGray font-mono text-[10px] uppercase">
+        FORM FOLLOWS FUNCTION // ALWAYS ARRIVE 5 MINUTES EARLY
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-bhDark text-white p-4 border-3 border-bhYellow shadow-[6px_6px_0px_#111111] font-black text-xs tracking-wider transform translate-y-20 opacity-0 transition-all duration-200 z-50 uppercase">
+    <span id="toastMsg">SUMMARY COPIED TO CLIPBOARD</span>
+  </div>
+
+  <script>
+    // Application State
+    const state = {
+      transit: 'subway',
+      weather: 'clear',
+      timeSlot: 'weekend_night',
+      isAutoSlot: true
+    };
+
+    // Delays Dictionary
+    const TRANSIT_DELAYS = {
+      subway: { name: 'SUBWAY', delay: 0 },
+      bus: { name: 'BUS', delay: 5 },
+      combined: { name: 'BUS + SUBWAY', delay: 7 }
+    };
+
+    const WEATHER_DELAYS = {
+      clear: { name: 'CLEAR / NORMAL', delay: 0 },
+      rain: { name: 'RAIN', delay: 10 },
+      snow: { name: 'SNOW / ICE', delay: 20 },
+      storm: { name: 'SEVERE STORM', delay: 25 }
+    };
+
+    const TIMESLOT_DELAYS = {
+      midnight: { name: 'LATE NIGHT / EARLY MORNING (00:00–06:00)', delay: 10 },
+      morning_rush: { name: 'MORNING PEAK RUSH (07:30–09:00)', delay: 15 },
+      daytime_standard: { name: 'DAYTIME OFF-PEAK (09:00–17:00)', delay: 0 },
+      evening_rush: { name: 'EVENING PEAK RUSH (17:30–20:00)', delay: 15 },
+      weekend_night: { name: 'FRIDAY / WEEKEND EVENING (18:00–22:00)', delay: 20 },
+      weekend_afternoon: { name: 'WEEKEND AFTERNOON (12:00–17:00)', delay: 10 },
+      last_train: { name: 'NEAR LAST TRAIN / BUS (22:30–24:00)', delay: 10 }
+    };
+
+    // Initialize Page
+    window.onload = function() {
+      // Set Today's Date
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      document.getElementById('targetDate').value = `${yyyy}-${mm}-${dd}`;
+
+      // Set Option States
+      setTransit('subway');
+      setWeather('clear');
+
+      // Bind Range Slider with Number Input
+      const range = document.getElementById('baseMinutesRange');
+      const numInput = document.getElementById('baseMinutes');
+      const valBadge = document.getElementById('baseMinutesVal');
+
+      range.addEventListener('input', function() {
+        numInput.value = this.value;
+        valBadge.innerText = `${this.value} MINS`;
+        recalculate();
+      });
+
+      numInput.addEventListener('input', function() {
+        range.value = this.value;
+        valBadge.innerText = `${this.value} MINS`;
+        recalculate();
+      });
+
+      // Bind Time inputs
+      document.getElementById('targetDate').addEventListener('change', handleTimeInputChange);
+      document.getElementById('targetTime').addEventListener('change', handleTimeInputChange);
+      document.getElementById('origin').addEventListener('input', recalculate);
+      document.getElementById('destination').addEventListener('input', recalculate);
+
+      // Start Clock Loop
+      updateClock();
+      setInterval(updateClock, 1000);
+
+      // Initial Calculation
+      handleTimeInputChange();
+    };
+
+    function updateClock() {
+      const now = new Date();
+      const hrs = now.getHours();
+      const mins = now.getMinutes();
+      const secs = now.getSeconds();
+
+      // SVG Clock Hands Rotation
+      const hourDeg = (hrs % 12) * 30 + (mins / 60) * 30;
+      const minDeg = mins * 6 + (secs / 60) * 6;
+      const secDeg = secs * 6;
+
+      document.getElementById('hourHand').setAttribute('transform', `rotate(${hourDeg} 50 50)`);
+      document.getElementById('minuteHand').setAttribute('transform', `rotate(${minDeg} 50 50)`);
+      document.getElementById('secondHand').setAttribute('transform', `rotate(${secDeg} 50 50)`);
+
+      // Digital Clock Readout
+      const period = hrs >= 12 ? 'PM' : 'AM';
+      const formattedHrs = String(hrs % 12 || 12).padStart(2, '0');
+      const formattedMins = String(mins).padStart(2, '0');
+      const formattedSecs = String(secs).padStart(2, '0');
+
+      document.getElementById('digitalClock').innerText = `${formattedHrs}:${formattedMins}:${formattedSecs} ${period}`;
+
+      const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+      const dayName = days[now.getDay()];
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      document.getElementById('digitalDate').innerText = `${yyyy}.${mm}.${dd} ${dayName}`;
+
+      checkIfDepartureExpired();
+    }
+
+    function setTransit(type) {
+      state.transit = type;
+      ['subway', 'bus', 'combined'].forEach(key => {
+        const el = document.getElementById(`transit-${key}`);
+        if (el) el.className = 'opt-card p-3 text-center';
+      });
+      const selected = document.getElementById(`transit-${type}`);
+      if (selected) selected.className = 'opt-card p-3 text-center selected-blue';
+      recalculate();
+    }
+
+    function setWeather(type) {
+      state.weather = type;
+      ['clear', 'rain', 'snow', 'storm'].forEach(key => {
+        const el = document.getElementById(`weather-${key}`);
+        if (el) el.className = 'opt-card p-2.5 text-center';
+      });
+      const selected = document.getElementById(`weather-${type}`);
+      if (selected) selected.className = 'opt-card p-2.5 text-center selected-red';
+      recalculate();
+    }
+
+    function handleTimeInputChange() {
+      if (state.isAutoSlot) {
+        autoDetectTimeSlot();
+      }
+      recalculate();
+    }
+
+    function manualTimeSlotChange() {
+      state.isAutoSlot = false;
+      state.timeSlot = document.getElementById('timeSlotSelect').value;
+      
+      const badge = document.getElementById('slotDetectionText');
+      if (badge) badge.innerText = 'MANUAL OVERRIDE ACTIVE';
+      
+      recalculate();
+    }
+
+    function autoDetectTimeSlot() {
+      state.isAutoSlot = true;
+      const dateVal = document.getElementById('targetDate').value;
+      const timeVal = document.getElementById('targetTime').value;
+
+      if (!dateVal || !timeVal) return;
+
+      const dateObj = new Date(`${dateVal}T${timeVal}`);
+      const dayOfWeek = dateObj.getDay(); // 0=Sun, 5=Fri, 6=Sat
+      const hours = dateObj.getHours();
+      const minutes = dateObj.getMinutes();
+      const totalMinutes = hours * 60 + minutes;
+
+      let detected = 'daytime_standard';
+
+      // 1. Late Night / Early Morning (00:00 - 06:00)
+      if (totalMinutes >= 0 && totalMinutes < 360) {
+        detected = 'midnight';
+      }
+      // 2. Morning Peak Rush (07:30 - 09:00, Weekdays)
+      else if (dayOfWeek >= 1 && dayOfWeek <= 5 && totalMinutes >= 450 && totalMinutes <= 540) {
+        detected = 'morning_rush';
+      }
+      // 3. Friday / Weekend Evening (18:00 - 22:00, Fri-Sun)
+      else if ((dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0) && totalMinutes >= 1080 && totalMinutes <= 1320) {
+        detected = 'weekend_night';
+      }
+      // 4. Weekend Afternoon (12:00 - 17:00, Sat-Sun)
+      else if ((dayOfWeek === 0 || dayOfWeek === 6) && totalMinutes >= 720 && totalMinutes <= 1020) {
+        detected = 'weekend_afternoon';
+      }
+      // 5. Evening Peak Rush (17:30 - 20:00, Weekdays)
+      else if (dayOfWeek >= 1 && dayOfWeek <= 5 && totalMinutes >= 1050 && totalMinutes <= 1200) {
+        detected = 'evening_rush';
+      }
+      // 6. Near Last Train (22:30 - 24:00)
+      else if (totalMinutes >= 1350 && totalMinutes <= 1440) {
+        detected = 'last_train';
+      }
+      // 7. Daytime Off-Peak (09:00 - 17:00)
+      else if (totalMinutes >= 540 && totalMinutes <= 1020) {
+        detected = 'daytime_standard';
+      }
+
+      state.timeSlot = detected;
+      document.getElementById('timeSlotSelect').value = detected;
+      
+      const badge = document.getElementById('slotDetectionText');
+      if (badge) badge.innerText = 'AUTO-DETECTED FROM TARGET ARRIVAL TIME';
+
+      recalculate();
+    }
+
+    function applyPreset(preset) {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      document.getElementById('targetDate').value = `${yyyy}-${mm}-${dd}`;
+
+      if (preset === 'morning_rush') {
+        document.getElementById('targetTime').value = '08:30';
+        document.getElementById('baseMinutes').value = '35';
+        document.getElementById('baseMinutesRange').value = '35';
+        document.getElementById('baseMinutesVal').innerText = '35 MINS';
+        setTransit('bus');
+        setWeather('clear');
+      } else if (preset === 'friday_night') {
+        document.getElementById('targetTime').value = '19:30';
+        document.getElementById('baseMinutes').value = '40';
+        document.getElementById('baseMinutesRange').value = '40';
+        document.getElementById('baseMinutesVal').innerText = '40 MINS';
+        setTransit('combined');
+        setWeather('clear');
+      } else if (preset === 'storm_delay') {
+        document.getElementById('targetTime').value = '14:00';
+        document.getElementById('baseMinutes').value = '30';
+        document.getElementById('baseMinutesRange').value = '30';
+        document.getElementById('baseMinutesVal').innerText = '30 MINS';
+        setTransit('bus');
+        setWeather('snow');
+      } else if (preset === 'late_night') {
+        document.getElementById('targetTime').value = '23:30';
+        document.getElementById('baseMinutes').value = '25';
+        document.getElementById('baseMinutesRange').value = '25';
+        document.getElementById('baseMinutesVal').innerText = '25 MINS';
+        setTransit('combined');
+        setWeather('clear');
+      }
+
+      autoDetectTimeSlot();
+      showToast(`PRESET APPLIED: ${preset.toUpperCase().replace('_', ' ')}`);
+    }
+
+    let calculatedDepartureDate = null;
+
+    function recalculate() {
+      const baseMin = parseInt(document.getElementById('baseMinutes').value) || 30;
+      const targetTimeVal = document.getElementById('targetTime').value;
+      const targetDateVal = document.getElementById('targetDate').value;
+
+      if (!targetTimeVal || !targetDateVal) return;
+
+      const transitPenalty = TRANSIT_DELAYS[state.transit].delay;
+      const weatherPenalty = WEATHER_DELAYS[state.weather].delay;
+      const slotPenalty = TIMESLOT_DELAYS[state.timeSlot].delay;
+      const safetyMargin = 5; // Mandatory Bauhaus Buffer
+
+      const totalLeadMinutes = baseMin + transitPenalty + weatherPenalty + slotPenalty + safetyMargin;
+
+      const targetDate = new Date(`${targetDateVal}T${targetTimeVal}`);
+      calculatedDepartureDate = new Date(targetDate.getTime() - totalLeadMinutes * 60000);
+      const safeArrivalDate = new Date(targetDate.getTime() - safetyMargin * 60000);
+
+      // Formatting Departure Output
+      const depHrs = calculatedDepartureDate.getHours();
+      const depMins = String(calculatedDepartureDate.getMinutes()).padStart(2, '0');
+      const period = depHrs >= 12 ? 'PM' : 'AM';
+      const formattedDepHrs = String(depHrs % 12 || 12).padStart(2, '0');
+
+      document.getElementById('depTimeBig').innerText = `${formattedDepHrs}:${depMins}`;
+      document.getElementById('depTimePeriod').innerText = period;
+      document.getElementById('totalLeadDisplay').innerText = `${totalLeadMinutes} MINS`;
+
+      // Update Breakdown Table
+      document.getElementById('tbl-base').innerText = `${baseMin} MIN`;
+      document.getElementById('tbl-transit').innerText = `+${transitPenalty} MIN`;
+      document.getElementById('tbl-weather').innerText = `+${weatherPenalty} MIN`;
+      document.getElementById('tbl-timeslot').innerText = `+${slotPenalty} MIN`;
+      document.getElementById('tbl-buffer').innerText = `+${safetyMargin} MIN`;
+      document.getElementById('tbl-total').innerText = `${totalLeadMinutes} MIN`;
+
+      // Update Geometric Proportional Bar
+      const pctBase = (baseMin / totalLeadMinutes) * 100;
+      const pctTransit = (transitPenalty / totalLeadMinutes) * 100;
+      const pctWeather = (weatherPenalty / totalLeadMinutes) * 100;
+      const pctSlot = (slotPenalty / totalLeadMinutes) * 100;
+      const pctBuffer = (safetyMargin / totalLeadMinutes) * 100;
+
+      document.getElementById('bar-base').style.width = `${pctBase}%`;
+      document.getElementById('bar-transit').style.width = `${pctTransit}%`;
+      document.getElementById('bar-weather').style.width = `${pctWeather}%`;
+      document.getElementById('bar-slot').style.width = `${pctSlot}%`;
+      document.getElementById('bar-buffer').style.width = `${pctBuffer}%`;
+
+      // Hide 0 width segments text
+      document.getElementById('bar-transit').innerText = transitPenalty > 0 ? 'TR' : '';
+      document.getElementById('bar-weather').innerText = weatherPenalty > 0 ? 'WX' : '';
+      document.getElementById('bar-slot').innerText = slotPenalty > 0 ? 'TS' : '';
+
+      // Update Timeline Sequence
+      const safeArrH = String(safeArrivalDate.getHours()).padStart(2, '0');
+      const safeArrM = String(safeArrivalDate.getMinutes()).padStart(2, '0');
+      
+      document.getElementById('tl-dep').innerText = `${String(depHrs).padStart(2, '0')}:${depMins}`;
+      document.getElementById('tl-arr').innerText = `${safeArrH}:${safeArrM}`;
+      document.getElementById('tl-target').innerText = targetTimeVal;
+
+      checkIfDepartureExpired();
+    }
+
+    function checkIfDepartureExpired() {
+      if (!calculatedDepartureDate) return;
+
+      const now = new Date();
+      const expiredBox = document.getElementById('expiredWarning');
+
+      if (now > calculatedDepartureDate) {
+        expiredBox.classList.remove('hidden');
+      } else {
+        expiredBox.classList.add('hidden');
+      }
+    }
+
+    function copySummary() {
+      const origin = document.getElementById('origin').value || 'ORIGIN';
+      const dest = document.getElementById('destination').value || 'DESTINATION';
+      const apptTime = document.getElementById('targetTime').value;
+      const depTime = document.getElementById('depTimeBig').innerText;
+      const period = document.getElementById('depTimePeriod').innerText;
+      const totalLead = document.getElementById('totalLeadDisplay').innerText;
+
+      const summaryText = `[ BAUHAUS SAFE DEPARTURE SUMMARY ]\nROUTE: ${origin} -> ${dest}\nTARGET ARRIVAL TIME: ${apptTime}\nRECOMMENDED DEPARTURE: ${depTime} ${period} (${totalLead} PRIOR LEAD TIME)\nINCLUDES MANDATORY 5-MINUTE BAUHAUS SAFETY BUFFER.`;
+
+      const textArea = document.createElement("textarea");
+      textArea.value = summaryText;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        document.execCommand('copy');
+        showToast('SUMMARY COPIED TO CLIPBOARD');
+      } catch (e) {
+        showToast('COPY FAILED');
+      } finally {
+        document.body.removeChild(textArea);
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.innerText = msg;
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
+    }
+  </script>
+</body>
+</html>
